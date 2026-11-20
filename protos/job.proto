@@ -1,0 +1,113 @@
+syntax = "proto3";
+
+package job;
+
+service JobService {
+  rpc CreateJob (CreateJobRequest) returns (JobActionResponse);
+  rpc FetchJob (FetchJobRequest) returns (JobResponse);
+  rpc FetchJobs (FetchJobsRequest) returns (FetchJobsResponse);
+  rpc UpdateJob (UpdateJobRequest) returns (JobActionResponse);
+  rpc DeleteJob (DeleteJobRequest) returns (JobActionResponse);
+}
+
+// ---------- shared ----------
+
+// The logged-in user, sent by the gateway with every request
+message UserRequestDto {
+  int32 id = 1;
+  string firstName = 2;
+  string lastName = 3;
+  string email = 4;
+}
+
+message JobIdRequestDto {
+  int32 jobId = 1;
+}
+
+message Job {
+  int32 id = 1;
+  string title = 2;
+  string company = 3;
+  string location = 4;
+  string type = 5;
+  optional int32 salaryMin = 6;
+  optional int32 salaryMax = 7;
+  optional string description = 8;
+  optional string notifiedAt = 9;
+  string createdAt = 10;
+}
+
+// ---------- requests: every request is { body, user } ----------
+
+message CreateJobRequest {
+  CreateJobRequestDto body = 1;
+  UserRequestDto user = 2;
+}
+
+message CreateJobRequestDto {
+  string title = 1;
+  string company = 2;
+  string location = 3;
+  string type = 4;
+  optional int32 salaryMin = 5;
+  optional int32 salaryMax = 6;
+  optional string description = 7;
+}
+
+message FetchJobRequest {
+  JobIdRequestDto body = 1;
+  UserRequestDto user = 2;
+}
+
+message FetchJobsRequest {
+  FetchJobsRequestDto body = 1;
+  UserRequestDto user = 2;
+}
+
+message FetchJobsRequestDto {
+  optional string q = 1;
+  optional string type = 2;
+  optional string location = 3;
+  optional int32 page = 4;
+  optional int32 pageSize = 5;
+}
+
+message UpdateJobRequest {
+  UpdateJobRequestDto body = 1;
+  UserRequestDto user = 2;
+}
+
+message UpdateJobRequestDto {
+  int32 jobId = 1;
+  optional string title = 2;
+  optional string company = 3;
+  optional string location = 4;
+  optional string type = 5;
+  optional int32 salaryMin = 6;
+  optional int32 salaryMax = 7;
+  optional string description = 8;
+}
+
+message DeleteJobRequest {
+  JobIdRequestDto body = 1;
+  UserRequestDto user = 2;
+}
+
+// ---------- responses ----------
+
+// Create / update / delete reply, e.g. { id: "5", message: "Successfully Deleted Job - 5" }
+message JobActionResponse {
+  string id = 1;
+  string message = 2;
+}
+
+message JobResponse {
+  Job job = 1;
+}
+
+message FetchJobsResponse {
+  repeated Job items = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 pageSize = 4;
+}
